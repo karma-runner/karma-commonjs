@@ -1,0 +1,31 @@
+{
+  "name": "karma-commonjs",
+  "version": "0.0.0",
+  "description": "A Karma plugin. Test CommonJS modules.",
+  "main": "lib/plugin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/karma-runner/karma-commonjs.git"
+  },
+  "keywords": [
+    "karma-plugin",
+    "commonjs"
+  ],
+  "author": "Vojta Jina <vojta.jina@gmail.com>",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-npm": "~0.0.2",
+    "grunt-bump": "~0.0.11",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-auto-release": "~0.0.3"
+  },
+  "peerDependencies": {
+    "karma": ">=0.9"
+  },
+  "license": "MIT",
+  "contributors": []
+}
