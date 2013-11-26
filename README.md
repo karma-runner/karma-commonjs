@@ -8,12 +8,17 @@ Creating a single bundle means "recompiling" the bundle anytime any file changes
 
 ## Installation
 
-The easiest way is to keep `karma-closure` as a devDependency in your `package.json`.
+The easiest way is to keep `karma-commonjs` as a devDependency:
+
+`npm install karma-commonjs --save-dev`
+
+which should result in the following entry in your `package.json`:
+
 ```json
 {
   "devDependencies": {
     "karma": "~0.10",
-    "karma-commonjs": "~0.1"
+    "karma-commonjs": "~0.2"
   }
 }
 ```
