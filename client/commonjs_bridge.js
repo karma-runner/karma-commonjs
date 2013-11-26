@@ -11,7 +11,9 @@
 
 
     function require(requiringFile, dependency) {
-        dependency = normalizePath(requiringFile, dependency);
+        if (!window.__cjs_module__[dependency]) {
+          dependency = normalizePath(requiringFile, dependency);
+        }
 
         // find module
         var moduleFn = window.__cjs_module__[dependency];
@@ -34,6 +36,10 @@
     };
 
     function normalizePath(basePath, relativePath) {
+        if (window.__cjs_map__ && window.__cjs_map__[relativePath]) {
+          relativePath = window.__cjs_map__[relativePath];
+        }
+
         if (isFullPath(relativePath)) return relativePath;
         if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
 
