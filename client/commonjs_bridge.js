@@ -21,8 +21,8 @@
         var module = cachedModules[dependency];
         if (module === undefined) {
             module = { exports: {} };
-            moduleFn(requireFn(dependency), module, module.exports);
             cachedModules[dependency] = module;
+            moduleFn(requireFn(dependency), module, module.exports);
         }
         return module.exports;
     };
