@@ -27,5 +27,8 @@
     "karma": ">=0.9"
   },
   "license": "MIT",
-  "contributors": []
+  "contributors": [
+    "James Shore <jshore@jamesshore.com>",
+    "Pawel Kozlowski <pkozlowski.opensource@gmail.com>"
+  ]
 }
