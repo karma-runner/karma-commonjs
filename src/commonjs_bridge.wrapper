@@ -1,0 +1,12 @@
+// Copyright (c) 2013 Titanium I.T. LLC. Licensed under the MIT license.
+(function() {
+    "use strict";
+
+    // load all modules
+    for (var modulePath in window.__cjs_module__) {
+        require(modulePath, modulePath);
+    };
+
+%CONTENT%
+
+})(window);

@@ -20,6 +20,7 @@
     "grunt": "~0.4.1",
     "grunt-npm": "~0.0.2",
     "grunt-bump": "~0.0.11",
+    "grunt-karma": "~0.6.2",
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-auto-release": "~0.0.3"
   },

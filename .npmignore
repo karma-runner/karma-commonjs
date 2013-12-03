@@ -1,3 +1,5 @@
 .*
-
 Gruntfile.coffee
+
+src
+test
