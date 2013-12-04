@@ -2,6 +2,9 @@ module.exports = (grunt) ->
 
   grunt.initConfig
 
+    build:
+      client: 'src/**/*.js'
+
     # JSHint options
     # http://www.jshint.com/options/
     jshint:
@@ -37,6 +40,13 @@ module.exports = (grunt) ->
         maxlen: 100
         globals: {}
 
+    karma:
+      client:
+        configFile: 'karma.conf.js'
+        autoWatch: false
+        singleRun: true
+        reporters: ['dots']
+
     'npm-contributors':
       options:
         commitMessage: 'chore: update contributors'
@@ -46,14 +56,17 @@ module.exports = (grunt) ->
         commitMessage: 'chore: release v%VERSION%'
         pushTo: 'upstream'
 
+  grunt.loadTasks 'tasks'
   grunt.loadNpmTasks 'grunt-contrib-jshint'
+  grunt.loadNpmTasks 'grunt-karma'
   grunt.loadNpmTasks 'grunt-bump'
   grunt.loadNpmTasks 'grunt-npm'
   grunt.loadNpmTasks 'grunt-auto-release'
 
-  grunt.registerTask 'travis', ['jshint']
+  grunt.registerTask 'default', ['karma:client', 'build']
   grunt.registerTask 'release', 'Build, bump and publish to NPM.', (type) ->
     grunt.task.run [
+      'build'
       'npm-contributors'
       "bump:#{type||'patch'}"
       'npm-publish'
