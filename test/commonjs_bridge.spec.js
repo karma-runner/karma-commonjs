@@ -2,12 +2,13 @@ describe('client', function() {
 
 	beforeEach(function(){
 		window.__cjs_module__ = {};
+		window.__cjs_modules_root__ = '/root';
 	});
 
 	it('should correctly resolve modules with circular dependencies issue #6', function(){
 
 		 window.__cjs_module__['/foo.js'] = function(require, module, exports) {
-		 	var bar = require('bar');
+		 	var bar = require('./bar');
 		 	exports.txt = 'foo';
 		 	exports.getText = function() {
 		 		return 'foo ' + bar.txt;
@@ -15,15 +16,15 @@ describe('client', function() {
 		 };
 
 		 window.__cjs_module__['/bar.js'] = function(require, module, exports) {
-		 	var foo = require('foo');
+		 	var foo = require('./foo');
 		 	exports.txt = 'bar';
 		 	exports.getText = function() {
 		 		return 'bar ' + foo.txt;
 		 	}
 		 };		
 
-		expect(require('/app.js', 'foo').getText()).toEqual('foo bar');
-		expect(require('/app.js', 'bar').getText()).toEqual('bar foo');
+		expect(require('/app.js', './foo').getText()).toEqual('foo bar');
+		expect(require('/app.js', './bar').getText()).toEqual('bar foo');
 	});
 
 	describe('path resolving and normalization', function(){
@@ -49,7 +50,7 @@ describe('client', function() {
 		});
 
 		it('should resolve paths without qualifiers as relative to a defined root', function(){
-			expect(normalizePath('/base/foo.js', 'bar')).toEqual('/base/bar.js');
+			expect(normalizePath('/base/foo.js', 'bar', '/my/root')).toEqual('/my/root/bar.js');
 		});
 
 	});
