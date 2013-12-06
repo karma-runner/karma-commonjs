@@ -1,5 +1,10 @@
 var cachedModules = {};
 
+// load all modules
+for (var modulePath in window.__cjs_module__) {
+    require(modulePath, modulePath);
+};
+
 function require(requiringFile, dependency) {
     dependency = normalizePath(requiringFile, dependency);
 

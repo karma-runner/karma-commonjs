@@ -2,11 +2,6 @@
 (function() {
     "use strict";
 
-    // load all modules
-    for (var modulePath in window.__cjs_module__) {
-        require(modulePath, modulePath);
-    };
-
-%CONTENT%
+	%CONTENT%
 
 })(window);
