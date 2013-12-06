@@ -39,6 +39,13 @@ module.exports = function(config) {
   });
 };
 ```
+Additionally you can specify a root folder (relative to project's directory) which is used to look for required modules:
+```
+commonjsPreprocessor: {
+  modulesRoot: 'some_folder'  
+}
+```
+When not specified the root folder default to the `karma.basePath` configuration option.
 
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
