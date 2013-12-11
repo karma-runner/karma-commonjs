@@ -1,5 +1,7 @@
 .*
 Gruntfile.coffee
+karma.conf.js
 
 src
 test
+tasks
