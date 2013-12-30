@@ -6,7 +6,7 @@ for (var modulePath in window.__cjs_module__) {
 };
 
 function require(requiringFile, dependency) {
-    dependency = normalizePath(requiringFile, dependency);
+    dependency = normalizePath(requiringFile, dependency, window.__cjs_modules_root__ || '');
 
     // find module
     var moduleFn = window.__cjs_module__[dependency];
@@ -28,23 +28,32 @@ function requireFn(basepath) {
     };
 };
 
-function normalizePath(basePath, relativePath) {
+function normalizePath(basePath, relativePath, modulesRoot) {
+
     if (isFullPath(relativePath)) return relativePath;
     if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
+
+    var relativePathLeadingChar = relativePath.charAt(0);
 
     var baseComponents = basePath.split("/");
     var relativeComponents = relativePath.split("/");
     var nextComponent;
+    
+    if (relativePathLeadingChar != '.') {
+        //pre-append defined root if needed, that is, dependency path is not full and doesn't start with one of . .. 
+        baseComponents = modulesRoot.split('/').concat(relativeComponents);
+    } else {
+        //else the path is somehow relative to the current files
+        baseComponents.pop();     // remove file portion of basePath before starting
+        while (relativeComponents.length > 0) {
+            nextComponent = relativeComponents.shift();
 
-    baseComponents.pop();     // remove file portion of basePath before starting
-    while (relativeComponents.length > 0) {
-        nextComponent = relativeComponents.shift();
-
-        if (nextComponent === ".") continue;
-        else if (nextComponent === "..") baseComponents.pop();
-        else baseComponents.push(nextComponent);
+            if (nextComponent === ".") continue;
+            else if (nextComponent === "..") baseComponents.pop();
+            else baseComponents.push(nextComponent);
+        }
     }
-
+    
     var normalizedPath = baseComponents.join("/");
 
     if (normalizedPath.substr(normalizedPath.length - 3) !== ".js") {
