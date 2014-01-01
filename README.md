@@ -45,7 +45,7 @@ commonjsPreprocessor: {
   modulesRoot: 'some_folder'  
 }
 ```
-When not specified the root folder default to the `karma.basePath` configuration option.
+When not specified the root folder default to the `karma.basePath/node_modules` configuration option.
 
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
