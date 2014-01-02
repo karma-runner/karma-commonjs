@@ -1,6 +1,6 @@
 {
   "name": "karma-commonjs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A Karma plugin. Test CommonJS modules.",
   "main": "lib/plugin.js",
   "scripts": {
