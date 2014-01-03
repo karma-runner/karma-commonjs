@@ -12,7 +12,7 @@ describe('client', function() {
 		 	exports.txt = 'foo';
 		 	exports.getText = function() {
 		 		return 'foo ' + bar.txt;
-		 	};		 	
+		 	};
 		 };
 
 		 window.__cjs_module__['/bar.js'] = function(require, module, exports) {
@@ -21,7 +21,7 @@ describe('client', function() {
 		 	exports.getText = function() {
 		 		return 'bar ' + foo.txt;
 		 	}
-		 };		
+		 };
 
 		expect(require('/app.js', './foo').getText()).toEqual('foo bar');
 		expect(require('/app.js', './bar').getText()).toEqual('bar foo');
@@ -50,7 +50,11 @@ describe('client', function() {
 		});
 
 		it('should resolve paths without qualifiers as relative to a defined root', function(){
-			expect(normalizePath('/base/foo.js', 'bar', '/my/root')).toEqual('/my/root/bar.js');
+      expect(normalizePath('/base/foo.js', 'bar', '/my/root')).toEqual('/my/root/bar.js');
+    });
+
+    it('should remove js extension from required non-js file formats', function(){
+			expect(require('/base/foo.js', 'styles.css')).toEqual('/root/styles.css');
 		});
 
 	});
