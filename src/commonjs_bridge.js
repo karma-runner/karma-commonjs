@@ -13,12 +13,16 @@ function require(requiringFile, dependency) {
     dependency = normalizePath(requiringFile, dependency, window.__cjs_modules_root__ || '');
 
     // Fix for non-js file types available if using webpack
-    if(dependency.match(/\.(css|png|jpg|jpeg|gif)/g)) {
+    var isNonJS = dependency.match(/\.(css|png|jpg|jpeg|gif)/g);
+
+    if(isNonJS) {
         dependency = dependency.replace(/\.js$/, '');
     }
     // find module
     var moduleFn = window.__cjs_module__[dependency];
-    if (moduleFn === undefined) return dependency.replace(/\.js$/, '');
+
+    if (moduleFn === undefined && isNonJS) return dependency;
+    else if(moduleFn === undefined) throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
 
     // run the module (if necessary)
     var module = cachedModules[dependency];
