@@ -14,7 +14,10 @@
     "karma-plugin",
     "commonjs"
   ],
-  "author": "Vojta Jina <vojta.jina@gmail.com>",
+  "author": {
+    "name": "Vojta Jina",
+    "email": "vojta.jina@gmail.com"
+  },
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -29,7 +32,23 @@
   },
   "license": "MIT",
   "contributors": [
-    "Pawel Kozlowski <pkozlowski.opensource@gmail.com>",
-    "James Shore <jshore@jamesshore.com>"
-  ]
+    {
+      "name": "Pawel Kozlowski",
+      "email": "pkozlowski.opensource@gmail.com"
+    },
+    {
+      "name": "James Shore",
+      "email": "jshore@jamesshore.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/karma-runner/karma-commonjs/issues"
+  },
+  "readme": "ERROR: No README data found!",
+  "_id": "karma-commonjs@0.0.6",
+  "dist": {
+    "shasum": "8dff4671339e8166f6ac2342c612617899e91b00"
+  },
+  "_from": "karma-commonjs@",
+  "_resolved": "https://registry.npmjs.org/karma-commonjs/-/karma-commonjs-0.0.6.tgz"
 }
