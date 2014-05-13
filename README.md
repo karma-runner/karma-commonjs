@@ -49,6 +49,18 @@ When not specified the root folder default to the `karma.basePath/node_modules` 
 
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
+## Mocking dependencies
+
+karma-commonjs enables you to mock modules within the scope of a module under test. When you write your tests you can require a given module one or more times, passing in different mock dependencies each time. To register mocks you pass in an additional object to the `require()` call. This object is keyed by the path of the modules you are mocking and the values are the mocks that are returned. For example:
+```js
+var loggerSpy = jasmine.createSpyObj('logger', ['info', 'debug', 'error']);
+var ApiWithMocks = require('../../src/api', {
+    '../../src/logger': loggerSpy
+});
+```
+
+When a module is required with mocks two things happen. Firstly module caching is bypassed so the module being required and all child modules encountered are loaded afresh. Secondly, the mocks are used throughout the dependency chain that is traversed.
+
 ----
 
 For more information on Karma see the [homepage].
