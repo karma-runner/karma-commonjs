@@ -5,17 +5,6 @@ for (var modulePath in window.__cjs_module__) {
     require(modulePath, modulePath);
 };
 
-function normalizeMockKeys(parent, mocks, modulesRoot) {
-    var normalizedMocks = {};
-    for(var relativePath in mocks) {
-        if(mocks.hasOwnProperty(relativePath)) {
-            var normalizedPath = normalizePath(parent, relativePath, modulesRoot);
-            normalizedMocks[normalizedPath] = mocks[relativePath];
-        }
-    }
-    return normalizedMocks;
-}
-
 function require(requiringFile, dependency, mocks) {
 
     if (window.__cjs_module__ === undefined) throw new Error("Could not find any modules. Did you remember to set 'preprocessors' in your Karma config?");
@@ -49,13 +38,13 @@ function require(requiringFile, dependency, mocks) {
     return module.exports;
 };
 
-function requireFn(basepath, bubbledMocks) {
-    return function(dependency, mocks) {
-        var fullPathMocks;
-        if(mocks) {
-            fullPathMocks = normalizeMockKeys(basepath, mocks, window.__cjs_modules_root__ || '');
+function requireFn(basepath, parentMocks) {
+    return function (dependency, mocks) {
+        var normalizedMocks;
+        if (mocks) {
+            normalizedMocks = normalizeMockPaths(basepath, mocks, window.__cjs_modules_root__ || '');
         }
-        return require(basepath, dependency, fullPathMocks || bubbledMocks);
+        return require(basepath, dependency, normalizedMocks || parentMocks);
     };
 };
 
@@ -101,4 +90,15 @@ function normalizePath(basePath, relativePath, modulesRoot) {
     function isNpmModulePath(path) {
       return path.charAt(0) !== ".";
     }
+}
+
+function normalizeMockPaths(parent, mocks, modulesRoot) {
+    var normalizedMocks = {};
+    for (var relativePath in mocks) {
+        if (mocks.hasOwnProperty(relativePath)) {
+            var normalizedPath = normalizePath(parent, relativePath, modulesRoot);
+            normalizedMocks[normalizedPath] = mocks[relativePath];
+        }
+    }
+    return normalizedMocks;
 }

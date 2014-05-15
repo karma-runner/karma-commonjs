@@ -53,5 +53,66 @@ describe('client', function() {
 			expect(normalizePath('/base/foo.js', 'bar', '/my/root')).toEqual('/my/root/bar.js');
 		});
 
+        it('should properly resolve full paths to mocks', function() {
+            var mocks = {
+                '../src/a-mock': 'mocked module a',
+                '../src/b-mock': 'mocked module b',
+            }
+
+            var expected = {
+                '/base/src/a-mock.js': 'mocked module a',
+                '/base/src/b-mock.js': 'mocked module b'
+            }
+
+            expect(normalizeMockPaths('/base/test/foo-spec.js', mocks)).toEqual(expected);
+        });
 	});
+
+    describe('module mocking', function() {
+
+        it('should return a mocked dependency if one is found', function () {
+            var requiringFile = '/base/foo.js';
+            var dependency = '/base/dependency1';
+            var mocks = {
+                '/base/dependency1': jasmine.createSpy('dependency1 mock')
+            };
+
+            var result = require(requiringFile, dependency, mocks);
+            expect(result).toBe(mocks['/base/dependency1']);
+        });
+
+        it('should return cached module if no mocks passed in', function () {
+            var requiringFile = '/base/foo.js';
+            var dependency = '/base/dependency1';
+            var originalModule = {
+                exports: jasmine.createSpy('dependency1 module')
+            };
+            window.__cjs_module__[dependency] = originalModule;
+
+            cachedModules[dependency] = originalModule;
+
+            var result = require(requiringFile, dependency);
+            expect(result).toBe(originalModule.exports);
+        });
+
+        it('should pass on mocks to sub modules', function () {
+            var requiringFile = '/base/foo.js';
+            var dependency = '/base/dependency1';
+            var originalModule = jasmine.createSpy('dependency1 module');
+            window.__cjs_module__[dependency] = originalModule;
+
+            var mocks = {
+                '/base/dependency2': jasmine.createSpy('dependency2 mock')
+            };
+
+            require(requiringFile, dependency, mocks);
+            var capturedRequireFn = originalModule.mostRecentCall.args[0];
+
+            var result = capturedRequireFn('/base/dependency2');
+            expect(result).toBe(mocks['/base/dependency2']);
+        });
+
+    });
+
+
 });
