@@ -38,8 +38,6 @@ function normalizePath(basePath, relativePath, modulesRoot) {
     if (isNpmModulePath(relativePath)) basePath = modulesRoot;
     if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
 
-    var relativePathLeadingChar = relativePath.charAt(0);
-
     var baseComponents = basePath.split("/");
     var relativeComponents = relativePath.split("/");
     var nextComponent;
