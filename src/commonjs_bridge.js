@@ -10,20 +10,31 @@ function require(requiringFile, dependency) {
     if (window.__cjs_module__ === undefined) throw new Error("Could not find any modules. Did you remember to set 'preprocessors' in your Karma config?");
     if (window.__cjs_modules_root__ === undefined) throw new Error("Could not find CommonJS module root path. Please report this issue to the karma-commonjs project.");
 
-    dependency = normalizePath(requiringFile, dependency, window.__cjs_modules_root__ || '');
+    var dependencyPaths = getDependencyPathCandidates(requiringFile, dependency, window.__cjs_modules_root__);
+    var dependencyPath;
 
-    // find module
-    var moduleFn = window.__cjs_module__[dependency];
-    if (moduleFn === undefined) throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
+    for (var i=0; i<dependencyPaths.length; i++) {
 
-    // run the module (if necessary)
-    var module = cachedModules[dependency];
-    if (module === undefined) {
-        module = { exports: {} };
-        cachedModules[dependency] = module;
-        moduleFn(requireFn(dependency), module, module.exports);
+      dependencyPath = dependencyPaths[i];
+
+      // find module
+      var moduleFn = window.__cjs_module__[dependencyPath];
+      if (moduleFn !== undefined) {
+
+        // run the module (if necessary)
+        var module = cachedModules[dependencyPath];
+        if (module === undefined) {
+          module = { exports: {} };
+          cachedModules[dependencyPath] = module;
+          moduleFn(requireFn(dependencyPath), module, module.exports);
+        }
+
+        return module.exports;
+      }
     }
-    return module.exports;
+
+    //none of the candidate paths was matching - throw
+    throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
 }
 
 function requireFn(basepath) {
@@ -32,9 +43,9 @@ function requireFn(basepath) {
     };
 }
 
-function normalizePath(basePath, relativePath, modulesRoot) {
+function getDependencyPathCandidates(basePath, relativePath, modulesRoot) {
 
-    if (isFullPath(relativePath)) return relativePath;
+    if (isFullPath(relativePath)) return [relativePath];
     if (isNpmModulePath(relativePath)) basePath = modulesRoot;
     if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
 
@@ -52,14 +63,16 @@ function normalizePath(basePath, relativePath, modulesRoot) {
         else if (nextComponent === "..") baseComponents.pop();
         else baseComponents.push(nextComponent);
     }
-    
+
     var normalizedPath = baseComponents.join("/");
+    var dependencyPathCandidates = [normalizedPath];
 
     if (normalizedPath.substr(normalizedPath.length - 3) !== ".js") {
-        normalizedPath += ".js";
+        dependencyPathCandidates.push(normalizedPath + ".js");
+        dependencyPathCandidates.push(normalizedPath + "/index.js");
     }
 
-    return normalizedPath;
+    return dependencyPathCandidates;
 
 
     function isFullPath(path) {

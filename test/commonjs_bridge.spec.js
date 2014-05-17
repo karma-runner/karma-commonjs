@@ -5,6 +5,7 @@ describe('client', function() {
     beforeEach(function(){
       window.__cjs_module__ = {};
       window.__cjs_modules_root__ = '/root';
+      cachedModules = {};
     });
 
     describe('resolve from a file', function () {
@@ -43,12 +44,32 @@ describe('client', function() {
 
     });
 
+    describe('resolve from folders', function () {
+
+      beforeEach(function () {
+        window.__cjs_module__['/folder/foo/index.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+      });
+
+      it('should be aware of index.js', function () {
+        expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
+      });
+
+      it('should resolve a file before resolving index.js', function () {
+        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports) {
+          exports.foo = false;
+        };
+        expect(require('/folder/bar.js', './foo').foo).toBeFalsy();
+      });
+    });
+
     describe('resolve - corner cases', function () {
 
       it('should throw error when a required module does not exist', function () {
         expect(function () {
           require('/file.js', './bar')
-        }).toThrow(new Error("Could not find module '/bar.js' from '/file.js'"));
+        }).toThrow(new Error("Could not find module './bar' from '/file.js'"));
       });
 
       it('should correctly resolve modules with circular dependencies issue #6', function(){
@@ -75,31 +96,4 @@ describe('client', function() {
     });
   });
 
-	describe('path resolving and normalization', function(){
-
-		it('should properly resolve full paths', function(){
-			expect(normalizePath('/base/foo.js', '/home/bar.js')).toEqual('/home/bar.js');
-		});
-
-		it('should properly resolve relative paths starting with .', function(){
-			expect(normalizePath('/base/foo.js', './bar.js')).toEqual('/base/bar.js');
-		});
-
-		it('should properly resolve relative paths starting with ..', function(){
-			expect(normalizePath('/base/sub/foo.js', '../bar.js')).toEqual('/base/bar.js');
-		});
-
-		it('should add .js suffix if necessery', function(){
-			expect(normalizePath('/foo.js', './bar')).toEqual('/bar.js');
-		});
-
-		it('should properly handle .. and . inside paths', function(){
-			expect(normalizePath('/base/sub/foo.js', './other/../../sub2/./bar.js')).toEqual('/base/sub2/bar.js');
-		});
-
-		it('should resolve paths without qualifiers as relative to a defined root', function(){
-			expect(normalizePath('/base/foo.js', 'bar', '/my/root')).toEqual('/my/root/bar.js');
-		});
-
-	});
 });
