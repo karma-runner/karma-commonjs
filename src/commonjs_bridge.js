@@ -3,7 +3,7 @@ var cachedModules = {};
 // load all modules
 for (var modulePath in window.__cjs_module__) {
     require(modulePath, modulePath);
-};
+}
 
 function require(requiringFile, dependency) {
 
@@ -24,13 +24,13 @@ function require(requiringFile, dependency) {
         moduleFn(requireFn(dependency), module, module.exports);
     }
     return module.exports;
-};
+}
 
 function requireFn(basepath) {
     return function(dependency) {
         return require(basepath, dependency);
     };
-};
+}
 
 function normalizePath(basePath, relativePath, modulesRoot) {
 
