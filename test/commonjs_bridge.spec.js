@@ -1,99 +1,118 @@
 describe('client', function() {
 
-  describe('require high level tests', function () {
+	beforeEach(function(){
+		window.__cjs_module__ = {};
+		window.__cjs_modules_root__ = '/root';
+	});
 
-    beforeEach(function(){
-      window.__cjs_module__ = {};
-      window.__cjs_modules_root__ = '/root';
-      cachedModules = {};
+	it('should correctly resolve modules with circular dependencies issue #6', function(){
+
+		 window.__cjs_module__['/foo.js'] = function(require, module, exports) {
+		 	var bar = require('./bar');
+		 	exports.txt = 'foo';
+		 	exports.getText = function() {
+		 		return 'foo ' + bar.txt;
+		 	};		 	
+		 };
+
+		 window.__cjs_module__['/bar.js'] = function(require, module, exports) {
+		 	var foo = require('./foo');
+		 	exports.txt = 'bar';
+		 	exports.getText = function() {
+		 		return 'bar ' + foo.txt;
+		 	}
+		 };		
+
+		expect(require('/app.js', './foo').getText()).toEqual('foo bar');
+		expect(require('/app.js', './bar').getText()).toEqual('bar foo');
+	});
+
+	describe('path resolving and normalization', function(){
+
+		it('should properly resolve full paths', function(){
+			expect(normalizePath('/base/foo.js', '/home/bar.js')).toEqual('/home/bar.js');
+		});
+
+		it('should properly resolve relative paths starting with .', function(){
+			expect(normalizePath('/base/foo.js', './bar.js')).toEqual('/base/bar.js');
+		});
+
+		it('should properly resolve relative paths starting with ..', function(){
+			expect(normalizePath('/base/sub/foo.js', '../bar.js')).toEqual('/base/bar.js');
+		});
+
+		it('should add .js suffix if necessery', function(){
+			expect(normalizePath('/foo.js', './bar')).toEqual('/bar.js');
+		});
+
+		it('should properly handle .. and . inside paths', function(){
+			expect(normalizePath('/base/sub/foo.js', './other/../../sub2/./bar.js')).toEqual('/base/sub2/bar.js');
+		});
+
+		it('should resolve paths without qualifiers as relative to a defined root', function(){
+			expect(normalizePath('/base/foo.js', 'bar', '/my/root')).toEqual('/my/root/bar.js');
+		});
+
+        it('should properly resolve full paths to mocks', function() {
+            var mocks = {
+                '../src/a-mock': 'mocked module a',
+                '../src/b-mock': 'mocked module b',
+            }
+
+            var expected = {
+                '/base/src/a-mock.js': 'mocked module a',
+                '/base/src/b-mock.js': 'mocked module b'
+            }
+
+            expect(normalizeMockPaths('/base/test/foo-spec.js', mocks)).toEqual(expected);
+        });
+	});
+
+    describe('module mocking', function() {
+
+        it('should return a mocked dependency if one is found', function () {
+            var requiringFile = '/base/foo.js';
+            var dependency = '/base/dependency1';
+            var mocks = {
+                '/base/dependency1': jasmine.createSpy('dependency1 mock')
+            };
+
+            var result = require(requiringFile, dependency, mocks);
+            expect(result).toBe(mocks['/base/dependency1']);
+        });
+
+        it('should return cached module if no mocks passed in', function () {
+            var requiringFile = '/base/foo.js';
+            var dependency = '/base/dependency1';
+            var originalModule = {
+                exports: jasmine.createSpy('dependency1 module')
+            };
+            window.__cjs_module__[dependency] = originalModule;
+
+            cachedModules[dependency] = originalModule;
+
+            var result = require(requiringFile, dependency);
+            expect(result).toBe(originalModule.exports);
+        });
+
+        it('should pass on mocks to sub modules', function () {
+            var requiringFile = '/base/foo.js';
+            var dependency = '/base/dependency1';
+            var originalModule = jasmine.createSpy('dependency1 module');
+            window.__cjs_module__[dependency] = originalModule;
+
+            var mocks = {
+                '/base/dependency2': jasmine.createSpy('dependency2 mock')
+            };
+
+            require(requiringFile, dependency, mocks);
+            var capturedRequireFn = originalModule.mostRecentCall.args[0];
+
+            var result = capturedRequireFn('/base/dependency2');
+            expect(result).toBe(mocks['/base/dependency2']);
+        });
+
     });
 
-    describe('resolve from a file', function () {
-
-      beforeEach(function () {
-        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports) {
-          exports.foo = true;
-        };
-      });
-
-      it('should resolve absolute dependencies', function () {
-        expect(require('/folder/bar.js', '/folder/foo.js').foo).toBeTruthy();
-        //TODO: check how this works in node: expect(require('/folder/bar.js', '/folder/foo').foo).toBeTruthy();
-      });
-
-      it('should resolve relative dependencies', function () {
-        expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
-        expect(require('/folder/bar.js', './foo.js').foo).toBeTruthy();
-        expect(require('/folder/bar.js', './../folder/foo.js').foo).toBeTruthy();
-      });
-    });
-
-    describe('resolve from node_modules', function () {
-
-      beforeEach(function () {
-        window.__cjs_modules_root__ = '/root/node_modules';
-        window.__cjs_module__['/root/node_modules/mymodule/foo.js'] = function(require, module, exports) {
-          exports.foo = true;
-        };
-      });
-
-      it('should resolve node_modules dependencies', function () {
-        expect(require('/folder/bar.js', 'mymodule/foo').foo).toBeTruthy();
-        expect(require('/folder/bar.js', 'mymodule/foo.js').foo).toBeTruthy();
-      });
-
-    });
-
-    describe('resolve from folders', function () {
-
-      beforeEach(function () {
-        window.__cjs_module__['/folder/foo/index.js'] = function(require, module, exports) {
-          exports.foo = true;
-        };
-      });
-
-      it('should be aware of index.js', function () {
-        expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
-      });
-
-      it('should resolve a file before resolving index.js', function () {
-        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports) {
-          exports.foo = false;
-        };
-        expect(require('/folder/bar.js', './foo').foo).toBeFalsy();
-      });
-    });
-
-    describe('resolve - corner cases', function () {
-
-      it('should throw error when a required module does not exist', function () {
-        expect(function () {
-          require('/file.js', './bar')
-        }).toThrow(new Error("Could not find module './bar' from '/file.js'"));
-      });
-
-      it('should correctly resolve modules with circular dependencies issue #6', function(){
-
-        window.__cjs_module__['/foo.js'] = function(require, module, exports) {
-          var bar = require('./bar');
-          exports.txt = 'foo';
-          exports.getText = function() {
-            return 'foo ' + bar.txt;
-          };
-        };
-
-        window.__cjs_module__['/bar.js'] = function(require, module, exports) {
-          var foo = require('./foo');
-          exports.txt = 'bar';
-          exports.getText = function() {
-            return 'bar ' + foo.txt;
-          }
-        };
-
-        expect(require('/app.js', './foo').getText()).toEqual('foo bar');
-        expect(require('/app.js', './bar').getText()).toEqual('bar foo');
-      });
-    });
-  });
 
 });
