@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/karma-runner/karma-commonjs.svg?branch=master)](https://travis-ci.org/karma-runner/karma-commonjs)
+
 # karma-commonjs
 
 > A Karma plugin that allows testing [CommonJS] modules in the browser. So if you are using [Browserify] for instance, you might find this plugin useful...

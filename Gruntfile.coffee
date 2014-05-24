@@ -45,7 +45,10 @@ module.exports = (grunt) ->
         configFile: 'karma.conf.js'
         autoWatch: false
         singleRun: true
-        reporters: ['dots']
+      tdd:
+        configFile: 'karma.conf.js'
+        autoWatch: true
+        singleRun: false
 
     'npm-contributors':
       options:

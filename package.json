@@ -1,6 +1,6 @@
 {
   "name": "karma-commonjs",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A Karma plugin. Test CommonJS modules.",
   "main": "lib/plugin.js",
   "scripts": {
@@ -29,7 +29,7 @@
   },
   "license": "MIT",
   "contributors": [
-    "Pawel Kozlowski <pkozlowski.opensource@gmail.com>",
+    "Vojta Jina <vojta.jina@gmail.com>",
     "James Shore <jshore@jamesshore.com>"
   ]
 }
