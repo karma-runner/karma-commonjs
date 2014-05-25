@@ -1,14 +1,6 @@
 var cachedModules = {};
 
-// load all modules
-for (var modulePath in window.__cjs_module__) {
-    require(modulePath, modulePath);
-}
-
 function require(requiringFile, dependency) {
-
-    if (window.__cjs_module__ === undefined) throw new Error("Could not find any modules. Did you remember to set 'preprocessors' in your Karma config?");
-    if (window.__cjs_modules_root__ === undefined) throw new Error("Could not find CommonJS module root path. Please report this issue to the karma-commonjs project.");
 
     var dependencyPaths = getDependencyPathCandidates(requiringFile, dependency, window.__cjs_modules_root__);
     var dependencyPath;
