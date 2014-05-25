@@ -37,44 +37,49 @@ function requireFn(basepath) {
 
 function getDependencyPathCandidates(basePath, relativePath, modulesRoot) {
 
-    if (isFullPath(relativePath)) return [relativePath];
-    if (isNpmModulePath(relativePath)) basePath = modulesRoot;
     if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
 
-    var baseComponents = basePath.split("/");
-    var relativeComponents = relativePath.split("/");
-    var nextComponent;
-    
-    if (!isNpmModulePath(relativePath)) {
-        baseComponents.pop();     // remove file portion of basePath before starting
-    }
-    while (relativeComponents.length > 0) {
-        nextComponent = relativeComponents.shift();
+    if (isFullPath(relativePath)) return [relativePath];
+    if (isNpmModulePath(relativePath)) basePath = modulesRoot + '/file.js'; //not pretty, but makes code simpler
 
-        if (nextComponent === ".") continue;
-        else if (nextComponent === "..") baseComponents.pop();
-        else baseComponents.push(nextComponent);
-    }
+    var normalizedPath = normalizeRelativePath(basePath, relativePath);
 
-    var normalizedPath = baseComponents.join("/");
     var dependencyPathCandidates = [normalizedPath];
-
     if (normalizedPath.substr(normalizedPath.length - 3) !== ".js") {
         dependencyPathCandidates.push(normalizedPath + ".js");
         dependencyPathCandidates.push(normalizedPath + "/index.js");
     }
 
     return dependencyPathCandidates;
+}
 
+function isFullPath(path) {
+  var unixFullPath = (path.charAt(0) === "/");
+  var windowsFullPath = (path.indexOf(":") !== -1);
 
-    function isFullPath(path) {
-        var unixFullPath = (path.charAt(0) === "/");
-        var windowsFullPath = (path.indexOf(":") !== -1);
+  return unixFullPath || windowsFullPath;
+}
 
-        return unixFullPath || windowsFullPath;
-    }
+function isNpmModulePath(path) {
+  return !isFullPath(path) && path.charAt(0) !== ".";
+}
 
-    function isNpmModulePath(path) {
-      return path.charAt(0) !== ".";
-    }
+function normalizeRelativePath(basePath, relativePath) {
+
+  var baseComponents = basePath.split("/");
+  var relativeComponents = relativePath.split("/");
+  var nextComponent;
+
+  // remove file portion of basePath before starting
+  baseComponents.pop();
+
+  while (relativeComponents.length > 0) {
+    nextComponent = relativeComponents.shift();
+
+    if (nextComponent === ".") continue;
+    else if (nextComponent === "..") baseComponents.pop();
+    else baseComponents.push(nextComponent);
+  }
+
+  return baseComponents.join("/");
 }
