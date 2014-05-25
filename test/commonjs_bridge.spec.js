@@ -66,6 +66,12 @@ describe('client', function() {
 
     describe('resolve - corner cases', function () {
 
+      it('should throw error when require base path is not absolute', function () {
+        expect(function () {
+          require('file.js', './bar')
+        }).toThrow(new Error("basePath should be full path, but was [file.js]"));
+      });
+
       it('should throw error when a required module does not exist', function () {
         expect(function () {
           require('/file.js', './bar')
