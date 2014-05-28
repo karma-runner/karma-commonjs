@@ -37,7 +37,11 @@ module.exports = function(config) {
 
     preprocessors: {
       '**/*.js': ['commonjs']
-    }
+    },
+    plugins: [
+    // ....
+      'karma-commonjs'
+    ]
   });
 };
 ```
