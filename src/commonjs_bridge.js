@@ -1,56 +1,58 @@
 var cachedModules = {};
 
+function loadPaths(paths, existingfiles) {
+  for (var i=0; i<paths.length; i++) {
+    if (existingfiles[paths[i]]) {
+      return {moduleFn: existingfiles[paths[i]], path: paths[i]};
+    }
+  }
+}
+
+function loadAsFile(dependency, existingfiles) {
+  return loadPaths([dependency, dependency + '.js'], existingfiles);
+}
+
+function loadAsDirectory(dependency, existingfiles) {
+  if (existingfiles[dependency + '/package.json']) {
+    return loadAsFile(dependency + '/' + existingfiles[dependency + '/package.json'].main, existingfiles);
+  }
+  return loadPaths([dependency + '/index.js'], existingfiles);
+}
+
+function runModule(moduleFn, dependencyPath) {
+
+  var module = cachedModules[dependencyPath];
+  if (module === undefined) {
+    module = { exports: {} };
+    cachedModules[dependencyPath] = module;
+    moduleFn(requireFn(dependencyPath), module, module.exports);
+  }
+
+  return module.exports;
+}
+
 function require(requiringFile, dependency) {
 
-    var dependencyPaths = getDependencyPathCandidates(requiringFile, dependency, window.__cjs_modules_root__);
-    var dependencyPath;
+  var moduleToRun, normalizedDepPath;
 
-    for (var i=0; i<dependencyPaths.length; i++) {
+  if (!isFullPath(requiringFile)) throw new Error("requiringFile path should be full path, but was [" + requiringFile + "]");
+  if (isNpmModulePath(dependency))requiringFile = window.__cjs_modules_root__ + '/file.js';
 
-      dependencyPath = dependencyPaths[i];
+  normalizedDepPath = normalizePath(requiringFile, dependency);
+  moduleToRun = loadAsFile(normalizedDepPath, window.__cjs_module__) || loadAsDirectory(normalizedDepPath, window.__cjs_module__);
 
-      // find module
-      var moduleFn = window.__cjs_module__[dependencyPath];
-      if (moduleFn !== undefined) {
-
-        // run the module (if necessary)
-        var module = cachedModules[dependencyPath];
-        if (module === undefined) {
-          module = { exports: {} };
-          cachedModules[dependencyPath] = module;
-          moduleFn(requireFn(dependencyPath), module, module.exports);
-        }
-
-        return module.exports;
-      }
-    }
-
+  if (moduleToRun) {
+    return runModule(moduleToRun.moduleFn, moduleToRun.path)
+  } else {
     //none of the candidate paths was matching - throw
     throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
+  }
 }
 
 function requireFn(basepath) {
     return function(dependency) {
         return require(basepath, dependency);
     };
-}
-
-function getDependencyPathCandidates(basePath, relativePath, modulesRoot) {
-
-    if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
-
-    if (isFullPath(relativePath)) return [relativePath];
-    if (isNpmModulePath(relativePath)) basePath = modulesRoot + '/file.js'; //not pretty, but makes code simpler
-
-    var normalizedPath = normalizeRelativePath(basePath, relativePath);
-
-    var dependencyPathCandidates = [normalizedPath];
-    if (normalizedPath.substr(normalizedPath.length - 3) !== ".js") {
-        dependencyPathCandidates.push(normalizedPath + ".js");
-        dependencyPathCandidates.push(normalizedPath + "/index.js");
-    }
-
-    return dependencyPathCandidates;
 }
 
 function isFullPath(path) {
@@ -61,10 +63,14 @@ function isFullPath(path) {
 }
 
 function isNpmModulePath(path) {
-  return !isFullPath(path) && path.charAt(0) !== ".";
+  return !isFullPath(path) && path.charAt(0) != '.';
 }
 
-function normalizeRelativePath(basePath, relativePath) {
+function normalizePath(basePath, relativePath) {
+
+  if (isFullPath(relativePath)) {
+    basePath = '';
+  }
 
   var baseComponents = basePath.split("/");
   var relativeComponents = relativePath.split("/");

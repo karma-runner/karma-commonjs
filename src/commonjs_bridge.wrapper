@@ -7,9 +7,11 @@
 
 	%CONTENT%
 
-	// load all modules
+	// load all modules, skip package.json
     for (var modulePath in window.__cjs_module__) {
-        require(modulePath, modulePath);
+        if (modulePath.indexOf('package.json', -12) === -1) {
+            require(modulePath, modulePath);
+        }
     }
 
 })(window);

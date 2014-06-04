@@ -18,7 +18,12 @@ describe('client', function() {
 
       it('should resolve absolute dependencies', function () {
         expect(require('/folder/bar.js', '/folder/foo.js').foo).toBeTruthy();
-        //TODO: check how this works in node: expect(require('/folder/bar.js', '/folder/foo').foo).toBeTruthy();
+        expect(require('/folder/bar.js', '/folder/foo').foo).toBeTruthy();
+      });
+
+      it('should resolve absolute dependencies with relative components in the deps path', function () {
+        expect(require('/folder/bar.js', '/folder/./foo.js').foo).toBeTruthy();
+        expect(require('/folder/bar.js', '/folder/../folder/foo').foo).toBeTruthy();
       });
 
       it('should resolve relative dependencies', function () {
@@ -46,13 +51,10 @@ describe('client', function() {
 
     describe('resolve from folders', function () {
 
-      beforeEach(function () {
+      it('should be aware of index.js', function () {
         window.__cjs_module__['/folder/foo/index.js'] = function(require, module, exports) {
           exports.foo = true;
         };
-      });
-
-      it('should be aware of index.js', function () {
         expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
       });
 
@@ -62,6 +64,27 @@ describe('client', function() {
         };
         expect(require('/folder/bar.js', './foo').foo).toBeFalsy();
       });
+
+      it('should support package.json', function () {
+        window.__cjs_module__['/somepackage/package.json'] = {
+          main: 'foo/index.js'
+        };
+        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+        expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
+      });
+
+      it('should support package.json without suffix', function () {
+        window.__cjs_module__['/somepackage/package.json'] = {
+          main: 'foo/index'
+        };
+        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+        expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
+      });
+
     });
 
     describe('resolve - corner cases', function () {
@@ -69,7 +92,7 @@ describe('client', function() {
       it('should throw error when require base path is not absolute', function () {
         expect(function () {
           require('file.js', './bar')
-        }).toThrow(new Error("basePath should be full path, but was [file.js]"));
+        }).toThrow(new Error("requiringFile path should be full path, but was [file.js]"));
       });
 
       it('should throw error when a required module does not exist', function () {

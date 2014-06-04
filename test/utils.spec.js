@@ -29,15 +29,15 @@ describe('Tests for various utility functions', function () {
   describe('normalize path', function () {
 
     it('should normalize relative path - happy path scenarios', function () {
-      expect(normalizeRelativePath('/foo/bar/baz/file.js', 'rel')).toEqual('/foo/bar/baz/rel');
-      expect(normalizeRelativePath('/foo/bar/baz/file.js', './rel')).toEqual('/foo/bar/baz/rel');
-      expect(normalizeRelativePath('/foo/bar/baz/file.js', '../../rel')).toEqual('/foo/rel');
-      expect(normalizeRelativePath('/foo/bar/baz/file.js', '../../bar/rel')).toEqual('/foo/bar/rel');
+      expect(normalizePath('/foo/bar/baz/file.js', 'rel')).toEqual('/foo/bar/baz/rel');
+      expect(normalizePath('/foo/bar/baz/file.js', './rel')).toEqual('/foo/bar/baz/rel');
+      expect(normalizePath('/foo/bar/baz/file.js', '../../rel')).toEqual('/foo/rel');
+      expect(normalizePath('/foo/bar/baz/file.js', '../../bar/rel')).toEqual('/foo/bar/rel');
     });
 
     //TODO(pk): not sure it is the "right" thing to do, but this test documents how the code works today
     it('should handle corner cases without throwing exceptions', function () {
-      expect(normalizeRelativePath('/foo/file.js', '../../../../rel')).toEqual('rel');
+      expect(normalizePath('/foo/file.js', '../../../../rel')).toEqual('rel');
     });
   });
 
