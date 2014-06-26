@@ -87,6 +87,24 @@ describe('client', function() {
 
     });
 
+    describe('__dirname and __filename "globals"', function () {
+
+      it('should expose __dirname "global"', function () {
+        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, __dirname) {
+          exports.dirname = __dirname;
+        };
+        expect(require('/foo/bar/baz.js', '/folder/file.js').dirname).toEqual('/foo/bar');
+      });
+
+      it('should expose __filename "global"', function () {
+        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, __dirname, __filename) {
+          exports.filename = __filename;
+        };
+        expect(require('/foo/bar/baz.js', '/folder/file.js').filename).toEqual('baz.js');
+      });
+
+    });
+
     describe('resolve - corner cases', function () {
 
       it('should throw error when require base path is not absolute', function () {
@@ -99,6 +117,12 @@ describe('client', function() {
         expect(function () {
           require('/file.js', './bar')
         }).toThrow(new Error("Could not find module './bar' from '/file.js'"));
+      });
+
+      it('should propery report errors for files requiring from the root path', function () {
+        expect(function () {
+          require('/folder/somefile.js', 'bar/baz.js')
+        }).toThrow(new Error("Could not find module 'bar/baz.js' from '/folder/somefile.js'"));
       });
 
       it('should correctly resolve modules with circular dependencies issue #6', function(){
