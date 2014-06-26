@@ -41,4 +41,20 @@ describe('Tests for various utility functions', function () {
     });
   });
 
+  describe('path utils', function () {
+
+    it('should provide basename-like utility', function () {
+      expect(basename('/dir/file.extension')).toEqual('file.extension');
+      expect(basename('/dir/file')).toEqual('file');
+      expect(basename('/dir')).toEqual('dir');
+      expect(basename('dir')).toEqual('dir');
+      expect(basename('')).toEqual('');
+    });
+
+    it('should provide dirname-like utility', function () {
+      expect(dirname('/dir/sub/file.extension')).toEqual('/dir/sub');
+      expect(dirname('/dir/file.extension')).toEqual('/dir');
+    });
+  });
+
 });

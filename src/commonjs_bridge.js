@@ -19,13 +19,13 @@ function loadAsDirectory(dependency, existingfiles) {
   return loadPaths([dependency + '/index.js'], existingfiles);
 }
 
-function runModule(moduleFn, dependencyPath) {
+function runModule(moduleFn, dependencyPath, requiringFilePath) {
 
   var module = cachedModules[dependencyPath];
   if (module === undefined) {
     module = { exports: {} };
     cachedModules[dependencyPath] = module;
-    moduleFn(requireFn(dependencyPath), module, module.exports);
+    moduleFn(requireFn(dependencyPath), module, module.exports, dirname(requiringFilePath), basename(requiringFilePath));
   }
 
   return module.exports;
@@ -36,13 +36,12 @@ function require(requiringFile, dependency) {
   var moduleToRun, normalizedDepPath;
 
   if (!isFullPath(requiringFile)) throw new Error("requiringFile path should be full path, but was [" + requiringFile + "]");
-  if (isNpmModulePath(dependency))requiringFile = window.__cjs_modules_root__ + '/file.js';
 
-  normalizedDepPath = normalizePath(requiringFile, dependency);
+  normalizedDepPath = normalizePath(isNpmModulePath(dependency) ? window.__cjs_modules_root__ + '/file.js' : requiringFile, dependency);
   moduleToRun = loadAsFile(normalizedDepPath, window.__cjs_module__) || loadAsDirectory(normalizedDepPath, window.__cjs_module__);
 
   if (moduleToRun) {
-    return runModule(moduleToRun.moduleFn, moduleToRun.path)
+    return runModule(moduleToRun.moduleFn, moduleToRun.path, requiringFile)
   } else {
     //none of the candidate paths was matching - throw
     throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
@@ -88,4 +87,12 @@ function normalizePath(basePath, relativePath) {
   }
 
   return baseComponents.join("/");
+}
+
+function basename(path) {
+  return path.substring(path.lastIndexOf('/') + 1);
+}
+
+function dirname(path) {
+  return path.substring(0, path.lastIndexOf('/'));
 }
