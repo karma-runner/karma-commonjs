@@ -33,16 +33,27 @@ describe('client', function() {
       });
     });
 
-    describe('resolve from node_modules', function () {
+    describe('resolve from node_modules and configured modules root', function () {
 
-      beforeEach(function () {
+      it('should resolve from the node_modules folder', function () {
+        window.__cjs_module__['/folder/node_modules/mymodule/foo.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+        expect(require('/folder/bar.js', 'mymodule/foo').foo).toBeTruthy();
+      });
+
+      it('should resolve from the node_modules parent folder', function () {
+        window.__cjs_module__['/folder/node_modules/mymodule/foo.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+        expect(require('/folder/subfolder/subsubfolder/bar.js', 'mymodule/foo').foo).toBeTruthy();
+      });
+
+      it('should resolve from the configured modules root', function () {
         window.__cjs_modules_root__ = '/root/node_modules';
         window.__cjs_module__['/root/node_modules/mymodule/foo.js'] = function(require, module, exports) {
           exports.foo = true;
         };
-      });
-
-      it('should resolve node_modules dependencies', function () {
         expect(require('/folder/bar.js', 'mymodule/foo').foo).toBeTruthy();
         expect(require('/folder/bar.js', 'mymodule/foo.js').foo).toBeTruthy();
       });

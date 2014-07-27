@@ -19,6 +19,10 @@ function loadAsDirectory(dependency, existingfiles) {
   return loadPaths([dependency + '/index.js'], existingfiles);
 }
 
+function loadAsFileOrDirectory(dependency, existingfiles) {
+  return loadAsFile(dependency, existingfiles) || loadAsDirectory(dependency, existingfiles);
+}
+
 function runModule(moduleFn, dependencyPath, requiringFilePath) {
 
   var module = cachedModules[dependencyPath];
@@ -34,11 +38,33 @@ function runModule(moduleFn, dependencyPath, requiringFilePath) {
 function require(requiringFile, dependency) {
 
   var moduleToRun, normalizedDepPath;
+  var requiringPathEls;
 
   if (!isFullPath(requiringFile)) throw new Error("requiringFile path should be full path, but was [" + requiringFile + "]");
 
-  normalizedDepPath = normalizePath(isNpmModulePath(dependency) ? window.__cjs_modules_root__ + '/file.js' : requiringFile, dependency);
-  moduleToRun = loadAsFile(normalizedDepPath, window.__cjs_module__) || loadAsDirectory(normalizedDepPath, window.__cjs_module__);
+  if (isNpmModulePath(dependency)) {
+
+    requiringPathEls = requiringFile.split('/');
+    requiringPathEls.pop(); //cut of file part
+    requiringPathEls.shift(); //cut of initial part coming from /
+
+    //load from node_modules, traversing folders hierarchy up
+    while (requiringPathEls.length && !moduleToRun) {
+      normalizedDepPath = normalizePath('/' +requiringPathEls.join('/') + '/node_modules/file.js', dependency);
+      moduleToRun = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+      requiringPathEls.pop();
+    }
+
+    //as the last resort try out the configured modules root
+    if (!moduleToRun) {
+      normalizedDepPath = normalizePath(window.__cjs_modules_root__ + '/file.js', dependency);
+      moduleToRun = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+    }
+
+  } else {
+    normalizedDepPath = normalizePath(requiringFile, dependency);
+    moduleToRun = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+  }
 
   if (moduleToRun) {
     return runModule(moduleToRun.moduleFn, moduleToRun.path, requiringFile)
