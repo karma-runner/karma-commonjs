@@ -31,6 +31,21 @@ describe('client', function() {
         expect(require('/folder/bar.js', './foo.js').foo).toBeTruthy();
         expect(require('/folder/bar.js', './../folder/foo.js').foo).toBeTruthy();
       });
+
+      it('should resolve dependencies to JSON files', function () {
+        window.__cjs_module__['/folder/baz.json'] = {baz: 'baz'};
+        expect(require('/folder/bar.js', './baz.json').baz).toEqual('baz');
+      });
+
+      it('should resolve dependencies to JSON files without extensions', function () {
+        window.__cjs_module__['/folder/baz.json'] = {baz: 'baz'};
+        expect(require('/folder/bar.js', './baz').baz).toEqual('baz');
+      });
+
+      it('should resolve dependencies to JS before resolving JSON', function () {
+        window.__cjs_module__['/folder/foo.json'] = {foo: false};
+        expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
+      });
     });
 
     describe('resolve from node_modules and configured modules root', function () {

@@ -3,13 +3,13 @@ var cachedModules = {};
 function loadPaths(paths, existingfiles) {
   for (var i=0; i<paths.length; i++) {
     if (existingfiles[paths[i]]) {
-      return {moduleFn: existingfiles[paths[i]], path: paths[i]};
+      return {module: existingfiles[paths[i]], path: paths[i]};
     }
   }
 }
 
 function loadAsFile(dependency, existingfiles) {
-  return loadPaths([dependency, dependency + '.js'], existingfiles);
+  return loadPaths([dependency, dependency + '.js', dependency + '.json'], existingfiles);
 }
 
 function loadAsDirectory(dependency, existingfiles) {
@@ -37,7 +37,7 @@ function runModule(moduleFn, dependencyPath, requiringFilePath) {
 
 function require(requiringFile, dependency) {
 
-  var moduleToRun, normalizedDepPath;
+  var resolvedModule, normalizedDepPath;
   var requiringPathEls;
 
   if (!isFullPath(requiringFile)) throw new Error("requiringFile path should be full path, but was [" + requiringFile + "]");
@@ -49,25 +49,29 @@ function require(requiringFile, dependency) {
     requiringPathEls.shift(); //cut of initial part coming from /
 
     //load from node_modules, traversing folders hierarchy up
-    while (requiringPathEls.length && !moduleToRun) {
+    while (requiringPathEls.length && !resolvedModule) {
       normalizedDepPath = normalizePath('/' +requiringPathEls.join('/') + '/node_modules/file.js', dependency);
-      moduleToRun = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+      resolvedModule = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
       requiringPathEls.pop();
     }
 
     //as the last resort try out the configured modules root
-    if (!moduleToRun) {
+    if (!resolvedModule) {
       normalizedDepPath = normalizePath(window.__cjs_modules_root__ + '/file.js', dependency);
-      moduleToRun = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+      resolvedModule = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
     }
 
   } else {
     normalizedDepPath = normalizePath(requiringFile, dependency);
-    moduleToRun = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+    resolvedModule = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
   }
 
-  if (moduleToRun) {
-    return runModule(moduleToRun.moduleFn, moduleToRun.path, requiringFile)
+  if (resolvedModule) {
+    if (typeof resolvedModule.module === 'function') {
+      return runModule(resolvedModule.module, resolvedModule.path, requiringFile)
+    } else {
+      return resolvedModule.module; //assume it is JSON
+    }
   } else {
     //none of the candidate paths was matching - throw
     throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
