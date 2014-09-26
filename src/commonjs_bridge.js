@@ -2,10 +2,28 @@ var cachedModules = {};
 
 function loadPaths(paths, existingfiles) {
   for (var i=0; i<paths.length; i++) {
+    paths[i] = normalizeFilePath(paths[i]);
     if (existingfiles[paths[i]]) {
       return {module: existingfiles[paths[i]], path: paths[i]};
     }
   }
+}
+
+// normalizes this: /home/test/../dev/././proj/file.js
+// to this        : /home/dev/proj/file.js
+function normalizeFilePath(path){
+  var components = path.split('/');
+  var nextComponent, result = [];
+
+  while (components.length > 0) {
+    nextComponent = components.shift();
+
+    if (nextComponent === '.') continue;
+    if (nextComponent === '..') result.pop();
+    else result.push(nextComponent);
+  }
+
+  return result.join("/");
 }
 
 function loadAsFile(dependency, existingfiles) {
