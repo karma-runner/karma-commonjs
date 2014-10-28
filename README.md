@@ -37,17 +37,38 @@ module.exports = function(config) {
 
     preprocessors: {
       '**/*.js': ['commonjs']
-    }
+    },
+
   });
+
+
 };
 ```
-Additionally you can specify a root folder (relative to project's directory) which is used to look for required modules:
+
+### Additional options
+
+
+**modulesRoot**
+
+You can specify a root folder (relative to project's directory) which is used to look for required modules:
 ```
 commonjsPreprocessor: {
-  modulesRoot: 'some_folder'  
+  modulesRoot: 'some_folder'
 }
 ```
 When not specified the root folder default to the `karma.basePath/node_modules` configuration option.
+
+
+**extensions**
+
+commonjsPreprocessor: {
+  fileExtensions: ['.some.ext']
+}
+
+You can add an array of extension types that are required in your source files. This is useful when using other
+preprocessors that act on files with other extensions types like `.coffee` or `.jsx`.
+
+The default extensions that the preprocessor includes are `.js` and `.json`
 
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
