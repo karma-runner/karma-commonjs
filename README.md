@@ -61,10 +61,11 @@ When not specified the root folder default to the `karma.basePath/node_modules` 
 
 **extensions**
 
+```
 commonjsPreprocessor: {
   fileExtensions: ['.some.ext']
 }
-
+```
 You can add an array of extension types that are required in your source files. This is useful when using other
 preprocessors that act on files with other extensions types like `.coffee` or `.jsx`.
 
