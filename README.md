@@ -2,11 +2,23 @@
 
 # karma-commonjs
 
-> A Karma plugin that allows testing [CommonJS] modules in the browser. So if you are using [Browserify] for instance, you might find this plugin useful...
+> A Karma plugin that allows testing [CommonJS] modules in the browser.
 
-### Why not just using Browserify for testing ?
+## Browserify
 
-Creating a single bundle means "recompiling" the bundle anytime any file changes. On big project, this can significantly slow down the development. This plugin processes only files that changed.
+If you're using Browserify to compile your projects you should consider [karma-bro](https://github.com/Nikku/karma-bro) which offers full support for the Browserify API and fast rebuilds. 
+
+#### karma-commonjs
+* Is lightweight and loads your code as-is
+* Supports Node's `require` algorithm
+* Requires you to manually add modules from `node_modules` to `karma.files` and `karma.preprocessors`
+* Loads each file individually and can limit refreshes to changed files
+
+#### karma-bro
+* Creates a temporary bundle using Browserify and offers sourcemap support to assist in debugging
+* Fully supports the Browserify API, including transforms, plugins, and shims for Node globals like `Buffer`
+* Uses [watchify](https://github.com/substack/watchify) to perform fast incremental rebuilds when bundle contents change
+* Automatically traverses all `require` calls to include modules in the bundle
 
 ## Installation
 
@@ -47,7 +59,7 @@ commonjsPreprocessor: {
   modulesRoot: 'some_folder'  
 }
 ```
-When not specified the root folder default to the `karma.basePath/node_modules` configuration option.
+When not specified the root folder defaults to the `karma.basePath/node_modules` configuration option.
 
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
