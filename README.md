@@ -6,19 +6,21 @@
 
 ## Browserify
 
-If you're using Browserify to compile your projects you should consider [karma-bro](https://github.com/Nikku/karma-bro) which offers full support for the Browserify API and fast rebuilds. 
+If you're using Browserify to compile your projects, you should consider [karma-browserify](https://github.com/Nikku/karma-browserify) which runs Browserify directly. The cost is slightly slower builds (but not too bad, thanks to an incremental loading algorithm) and somewhat messier stack traces. The benefit is support for the full Browserify API and automatic discovery of 'require'd files.
 
 #### karma-commonjs
-* Is lightweight and loads your code as-is
-* Supports Node's `require` algorithm
-* Requires you to manually add modules from `node_modules` to `karma.files` and `karma.preprocessors`
-* Loads each file individually and can limit refreshes to changed files
+1. Provides a lightweight commonjs wrapper around your code
+2. Supports Node's `require` algorithm
+3. Only reloads files that change
+4. Provides stack traces that point to your original files
+5. Requires you to specify files in the Karma config file
 
-#### karma-bro
-* Creates a temporary bundle using Browserify and offers sourcemap support to assist in debugging
-* Fully supports the Browserify API, including transforms, plugins, and shims for Node globals like `Buffer`
-* Uses [watchify](https://github.com/substack/watchify) to perform fast incremental rebuilds when bundle contents change
-* Automatically traverses all `require` calls to include modules in the bundle
+#### karma-browserify
+1. Creates a temporary bundle using Browserify
+2. Supports the full Browserify API, including transforms, plugins, and shims for Node globals
+3. Uses [watchify](https://github.com/substack/watchify) to perform incremental rebuilds
+4. Can use source maps to provide useful stack traces
+5. Automatically includes required files
 
 ## Installation
 
