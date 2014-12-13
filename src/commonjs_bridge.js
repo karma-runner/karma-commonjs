@@ -13,8 +13,9 @@ function loadAsFile(dependency, existingfiles) {
 }
 
 function loadAsDirectory(dependency, existingfiles) {
-  if (existingfiles[dependency + '/package.json']) {
-    return loadAsFile(dependency + '/' + existingfiles[dependency + '/package.json'].main, existingfiles);
+  var pkgJsonPath = dependency + '/package.json';
+  if (existingfiles[pkgJsonPath]) {
+    return loadAsFile(normalizePath('', dependency + '/' + existingfiles[pkgJsonPath].main), existingfiles);
   }
   return loadPaths([dependency + '/index.js'], existingfiles);
 }

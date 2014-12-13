@@ -101,6 +101,16 @@ describe('client', function() {
         expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
       });
 
+      it('should support relative paths in package.json', function () {
+        window.__cjs_module__['/somepackage/package.json'] = {
+          main: 'foo/./../foo/index.js'
+        };
+        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+        expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
+      });
+
       it('should support package.json without suffix', function () {
         window.__cjs_module__['/somepackage/package.json'] = {
           main: 'foo/index'
