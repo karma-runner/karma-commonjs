@@ -144,7 +144,7 @@ describe('client', function() {
     describe('special objects', function() {
       it('should expose "global" object as "window"', function() {
         window.__cjs_module__['/folder/foo.js'] = function(require, module, exports, __dirname, __filename, global) {
-          exports.foo = false;
+          exports.global = global;
         };
         expect(require('/folder/bar.js', './foo').global).toEqual(window);
       });
