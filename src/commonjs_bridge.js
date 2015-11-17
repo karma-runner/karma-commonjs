@@ -30,7 +30,7 @@ function runModule(moduleFn, dependencyPath, requiringFilePath) {
   if (module === undefined) {
     module = { exports: {} };
     cachedModules[dependencyPath] = module;
-    moduleFn(requireFn(dependencyPath), module, module.exports, dirname(requiringFilePath), basename(requiringFilePath));
+    moduleFn(requireFn(dependencyPath), module, module.exports, window, dirname(requiringFilePath), basename(requiringFilePath));
   }
 
   return module.exports;

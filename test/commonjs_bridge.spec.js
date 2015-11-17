@@ -11,7 +11,7 @@ describe('client', function() {
     describe('resolve from a file', function () {
 
       beforeEach(function () {
-        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports) {
+        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
       });
@@ -51,14 +51,14 @@ describe('client', function() {
     describe('resolve from node_modules and configured modules root', function () {
 
       it('should resolve from the node_modules folder', function () {
-        window.__cjs_module__['/folder/node_modules/mymodule/foo.js'] = function(require, module, exports) {
+        window.__cjs_module__['/folder/node_modules/mymodule/foo.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/bar.js', 'mymodule/foo').foo).toBeTruthy();
       });
 
       it('should resolve from the node_modules parent folder', function () {
-        window.__cjs_module__['/folder/node_modules/mymodule/foo.js'] = function(require, module, exports) {
+        window.__cjs_module__['/folder/node_modules/mymodule/foo.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/subfolder/subsubfolder/bar.js', 'mymodule/foo').foo).toBeTruthy();
@@ -66,7 +66,7 @@ describe('client', function() {
 
       it('should resolve from the configured modules root', function () {
         window.__cjs_modules_root__ = '/root/node_modules';
-        window.__cjs_module__['/root/node_modules/mymodule/foo.js'] = function(require, module, exports) {
+        window.__cjs_module__['/root/node_modules/mymodule/foo.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/bar.js', 'mymodule/foo').foo).toBeTruthy();
@@ -78,14 +78,14 @@ describe('client', function() {
     describe('resolve from folders', function () {
 
       it('should be aware of index.js', function () {
-        window.__cjs_module__['/folder/foo/index.js'] = function(require, module, exports) {
+        window.__cjs_module__['/folder/foo/index.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
       });
 
       it('should resolve a file before resolving index.js', function () {
-        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports) {
+        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports, global) {
           exports.foo = false;
         };
         expect(require('/folder/bar.js', './foo').foo).toBeFalsy();
@@ -95,7 +95,7 @@ describe('client', function() {
         window.__cjs_module__['/somepackage/package.json'] = {
           main: 'foo/index.js'
         };
-        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports) {
+        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
@@ -105,7 +105,7 @@ describe('client', function() {
         window.__cjs_module__['/somepackage/package.json'] = {
           main: 'foo/./../foo/index.js'
         };
-        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports) {
+        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
@@ -115,7 +115,7 @@ describe('client', function() {
         window.__cjs_module__['/somepackage/package.json'] = {
           main: 'foo/index'
         };
-        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports) {
+        window.__cjs_module__['/somepackage/foo/index.js'] = function(require, module, exports, global) {
           exports.foo = true;
         };
         expect(require('/folder/bar.js', '/somepackage').foo).toBeTruthy();
@@ -126,14 +126,14 @@ describe('client', function() {
     describe('__dirname and __filename "globals"', function () {
 
       it('should expose __dirname "global"', function () {
-        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, __dirname) {
+        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, global, __dirname) {
           exports.dirname = __dirname;
         };
         expect(require('/foo/bar/baz.js', '/folder/file.js').dirname).toEqual('/foo/bar');
       });
 
       it('should expose __filename "global"', function () {
-        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, __dirname, __filename) {
+        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, global, __dirname, __filename) {
           exports.filename = __filename;
         };
         expect(require('/foo/bar/baz.js', '/folder/file.js').filename).toEqual('baz.js');
@@ -163,7 +163,7 @@ describe('client', function() {
 
       it('should correctly resolve modules with circular dependencies issue #6', function(){
 
-        window.__cjs_module__['/foo.js'] = function(require, module, exports) {
+        window.__cjs_module__['/foo.js'] = function(require, module, exports, global) {
           var bar = require('./bar');
           exports.txt = 'foo';
           exports.getText = function() {
@@ -171,7 +171,7 @@ describe('client', function() {
           };
         };
 
-        window.__cjs_module__['/bar.js'] = function(require, module, exports) {
+        window.__cjs_module__['/bar.js'] = function(require, module, exports, global) {
           var foo = require('./foo');
           exports.txt = 'bar';
           exports.getText = function() {
