@@ -141,6 +141,15 @@ describe('client', function() {
 
     });
 
+    describe('special objects', function() {
+      it('should expose "global" object as "window"', function() {
+        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, global, __dirname, __filename) {
+          exports.global = global;
+        };
+        expect(require('/folder/file.js').global).toEqual(window);
+      });
+    });
+
     describe('resolve - corner cases', function () {
 
       it('should throw error when require base path is not absolute', function () {
