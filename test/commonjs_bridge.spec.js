@@ -143,10 +143,10 @@ describe('client', function() {
 
     describe('special objects', function() {
       it('should expose "global" object as "window"', function() {
-        window.__cjs_module__['/folder/file.js'] = function(require, module, exports, global, __dirname, __filename) {
-          exports.global = global;
+        window.__cjs_module__['/folder/foo.js'] = function(require, module, exports, global) {
+          exports.foo = false;
         };
-        expect(require('/folder/file.js').global).toEqual(window);
+        expect(require('/folder/bar.js', './foo').global).toEqual(window);
       });
     });
 
