@@ -58,10 +58,20 @@ module.exports = function(config) {
 Additionally you can specify a root folder (relative to project's directory) which is used to look for required modules:
 ```
 commonjsPreprocessor: {
-  modulesRoot: 'some_folder'  
+  modulesRoot: 'some_folder'
 }
 ```
 When not specified the root folder defaults to the `karma.basePath/node_modules` configuration option.
+
+Also you can specify istanbul ignore flag that will not include wrapper code to the coverage report ([Ignoring code for coverage](https://github.com/gotwarlost/istanbul#ignoring-code-for-coverage)):
+```
+commonjsPreprocessor: {
+  istanbul: {
+    ignore: true,
+    comment: '/* istanbul ignore next */'
+  }
+}
+```
 
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
