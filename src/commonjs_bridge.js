@@ -36,10 +36,30 @@ function runModule(moduleFn, dependencyPath, requiringFilePath) {
   return module.exports;
 }
 
+function normalizeRelativePath(parentPath, path) {
+    parentPath = parentPath.charAt(parentPath.length - 1) === '/' ? parentPath.substr(0, parentPath.length - 1) : parentPath;
+    if (parentPath && parentPath.length > 0 && path && path.length > 0) {
+        while (path.charAt(0) === '.') {
+            if (path.indexOf('../') === 0) {
+                path = path.substr(path.indexOf('/') + 1);
+                parentPath = parentPath.substr(0, parentPath.lastIndexOf('/'));
+            } else if (path.indexOf('./') === 0) {
+                path = path.substr(path.indexOf('/') + 1);
+            }
+        }
+        return parentPath + (path.charAt(0) === '/' ? path : '/' + path);
+    }
+}
+
 function require(requiringFile, dependency) {
 
   var resolvedModule, normalizedDepPath;
   var requiringPathEls;
+  
+  if (window.__karma_config__ && window.__karma_config__.alias && window.__karma_config__.alias[dependency]) {
+    normalizedDepPath = normalizeRelativePath(window.__cjs_modules_root__, window.__karma_config__.alias[dependency]);
+    resolvedModule = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
+  }
 
   if (!isFullPath(requiringFile)) throw new Error("requiringFile path should be full path, but was [" + requiringFile + "]");
 
