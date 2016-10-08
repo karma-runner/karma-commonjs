@@ -73,6 +73,13 @@ describe('client', function() {
         expect(require('/folder/bar.js', 'mymodule/foo.js').foo).toBeTruthy();
       });
 
+      it('should resolve on Windows', function() {
+        window.__cjs_module__['c:/folder/node_modules/mymodule/foo.js'] = function(require, module, exports) {
+          exports.foo = true;
+        };
+        expect(require('c:/folder/bar.js', 'mymodule/foo').foo).toBeTruthy();
+      });
+
     });
 
     describe('resolve from folders', function () {
