@@ -46,12 +46,12 @@ function require(requiringFile, dependency) {
   if (isNpmModulePath(dependency)) {
 
     requiringPathEls = requiringFile.split('/');
-    requiringPathEls.pop(); //cut of file part
-    requiringPathEls.shift(); //cut of initial part coming from /
+    requiringPathEls.pop(); //cut off file part
+    var drive = requiringPathEls.shift(); //cut off part coming before first / ('c:' on Windows, '' on Unix)
 
     //load from node_modules, traversing folders hierarchy up
     while (requiringPathEls.length && !resolvedModule) {
-      normalizedDepPath = normalizePath('/' +requiringPathEls.join('/') + '/node_modules/file.js', dependency);
+      normalizedDepPath = normalizePath(drive + '/' +requiringPathEls.join('/') + '/node_modules/file.js', dependency);
       resolvedModule = loadAsFileOrDirectory(normalizedDepPath, window.__cjs_module__);
       requiringPathEls.pop();
     }
