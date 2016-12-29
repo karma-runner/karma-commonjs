@@ -9,7 +9,11 @@ function loadPaths(paths, existingfiles) {
 }
 
 function loadAsFile(dependency, existingfiles) {
-  return loadPaths([dependency, dependency + '.js', dependency + '.json'], existingfiles);
+  var extensions = [''].concat(window.__cjs_file_extensions__);
+  var paths = extensions.map(function(ext) {
+    return dependency + ext;
+  });
+  return loadPaths(paths, existingfiles);
 }
 
 function loadAsDirectory(dependency, existingfiles) {

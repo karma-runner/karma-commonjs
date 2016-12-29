@@ -5,6 +5,7 @@ describe('client', function() {
     beforeEach(function(){
       window.__cjs_module__ = {};
       window.__cjs_modules_root__ = '/root';
+      window.__cjs_file_extensions__ = ['.js', '.json'];
       cachedModules = {};
     });
 
@@ -45,6 +46,25 @@ describe('client', function() {
       it('should resolve dependencies to JS before resolving JSON', function () {
         window.__cjs_module__['/folder/foo.json'] = {foo: false};
         expect(require('/folder/bar.js', './foo').foo).toBeTruthy();
+      });
+
+      describe('with any file extension', function() {
+
+        beforeEach(function() {
+          window.__cjs_file_extensions__ = ['.js', '.json', '.cljs', '.jsx'];
+        });
+
+        it('should resolve a non JS or JSON file extension', function() {
+          window.__cjs_module__['/folder/baz.cljs'] = {baz: 'baz'};
+          expect(require('/folder/bar.js', '/folder/baz.cljs').baz).toEqual('baz');
+          expect(require('/folder/bar.js', '/folder/baz').baz).toEqual('baz');
+        });
+
+        it('should resolve dependencies to JS and JSON before other file extensions', function() {
+          window.__cjs_module__['/folder/boo.json'] = {boo: true};
+          window.__cjs_module__['/folder/boo.jsx'] = {boo: false};
+          expect(require('/folder/bar.js', './boo').boo).toBeTruthy();
+        });
       });
     });
 
