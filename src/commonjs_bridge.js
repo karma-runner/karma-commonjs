@@ -2,6 +2,7 @@ var cachedModules = {};
 
 function loadPaths(paths, existingfiles) {
   for (var i=0; i<paths.length; i++) {
+    paths[i] = normalizePath('', paths[i]);
     if (existingfiles[paths[i]]) {
       return {module: existingfiles[paths[i]], path: paths[i]};
     }
