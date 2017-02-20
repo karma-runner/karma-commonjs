@@ -28,7 +28,7 @@
     "karma-firefox-launcher": "1.x"
   },
   "peerDependencies": {
-    "karma": ">=0.9"
+    "karma": ">=1.5.0"
   },
   "license": "MIT",
   "contributors": [
