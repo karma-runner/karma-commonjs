@@ -24,7 +24,7 @@
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-auto-release": "~0.0.3",
     "karma-jasmine": "1.x",
-    "karma-chrome-launcher": "1.x",
+    "karma-chrome-launcher": "2.1.1",
     "karma-firefox-launcher": "1.x"
   },
   "peerDependencies": {
