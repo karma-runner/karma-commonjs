@@ -57,7 +57,7 @@ module.exports = (grunt) ->
     bump:
       options:
         commitMessage: 'chore: release v%VERSION%'
-        pushTo: 'upstream'
+        pushTo: 'origin'
 
   grunt.loadTasks 'tasks'
   grunt.loadNpmTasks 'grunt-contrib-jshint'
