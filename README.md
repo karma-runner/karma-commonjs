@@ -63,6 +63,31 @@ commonjsPreprocessor: {
 ```
 When not specified the root folder defaults to the `karma.basePath/node_modules` configuration option.
 
+#### Externals
+
+When external dependencies have prebundled sources.
+You can specify what file should be included from the root folder
+
+```js
+// karma.conf.js
+module.exports = function(config) {
+  config.set({
+    // ...
+    commonjsPreprocessor: {
+      modulesRoot: 'components',
+      externals: {
+        'angular': 'angular/angular.min.js'
+      }
+    },
+    // ...
+  });
+};
+```
+
+This effectively translates any `require('angular')` statements into `require('./components/angular/angular.min.js')`.
+
+----
+
 For an example project, check out Karma's [client tests](https://github.com/karma-runner/karma/tree/master/test/client).
 
 ----
