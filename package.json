@@ -1,5 +1,5 @@
 {
-  "name": "karma-commonjs",
+  "name": "@jamcoupe/karma-commonjs",
   "version": "1.0.0",
   "description": "A Karma plugin. Test CommonJS modules.",
   "main": "lib/plugin.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/karma-runner/karma-commonjs.git"
+    "url": "git://github.com/jamcoupe/karma-commonjs.git"
   },
   "keywords": [
     "karma-plugin",
@@ -17,15 +17,16 @@
   "author": "Vojta Jina <vojta.jina@gmail.com>",
   "dependencies": {},
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-npm": "~0.0.2",
-    "grunt-bump": "~0.0.11",
-    "grunt-karma": "1.x || ~1.0.0",
-    "grunt-contrib-jshint": "~0.6.0",
-    "grunt-auto-release": "~0.0.3",
-    "karma-jasmine": "1.x",
-    "karma-chrome-launcher": "1.x",
-    "karma-firefox-launcher": "1.x"
+    "grunt": "1.0.4",
+    "grunt-npm": "0.0.2",
+    "grunt-bump": "0.8.0",
+    "grunt-karma": "3.0.2",
+    "grunt-contrib-jshint": "2.1.0",
+    "grunt-auto-release": "0.0.7",
+    "karma-jasmine": "2.0.1",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-firefox-launcher": "1.1.0",
+    "karma": "4.1.0"
   },
   "peerDependencies": {
     "karma": ">=0.9"

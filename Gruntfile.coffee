@@ -54,10 +54,14 @@ module.exports = (grunt) ->
       options:
         commitMessage: 'chore: update contributors'
 
+    'auto-release':
+      options:
+        remote: 'origin'
+
     bump:
       options:
         commitMessage: 'chore: release v%VERSION%'
-        pushTo: 'upstream'
+        pushTo: 'origin'
 
   grunt.loadTasks 'tasks'
   grunt.loadNpmTasks 'grunt-contrib-jshint'
